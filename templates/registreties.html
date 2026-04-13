@@ -1,0 +1,32 @@
+{% extends "sagatave.html" %}
+
+{% block content %}
+<h2>Sveicināti  Investo!</h2>
+	<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow border-success">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Reģistrēties ✍️</h2>
+                <form action="/registreties" method="POST">
+                    <div class="mb-3">
+                        <label for="reg_user" class="form-label">Izdomā lietotājvārdu</label>
+                        <input type="text" class="form-control" id="reg_user" name="lietotajs" placeholder="Tavs unikālais lietotājvārds:" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="reg_pw" class="form-label">Droša parole</label>
+                        <input type="password" class="form-control" id="reg_pw" name="parole" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Izveidot profilu</button>
+                </form>
+                <p class="mt-3 text-center small">
+                    Jau esi savējais? <a href="/pieteikties">Dodies uz pieteikšanos!</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
