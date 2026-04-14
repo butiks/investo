@@ -1,7 +1,7 @@
 :root {
     --primary-custom: #99582a;    /* Nomaini uz savu Primary HEX kodu */
     --accent-custom: #780000;     /* Nomaini uz savu Secondary HEX kodu */
-    --bg-light: #F8F9FA;          /* Gaišais fons */
+    --bg-light: #99582a;          /* Gaišais fons */
 }
 
 /* Galvenās pogas krāsa */
@@ -33,9 +33,19 @@ a {
 }
 body {
     font-family: 'Lato', sans-serif; /* Nomaini uz savu pamatteksta fontu */
+    background-color : #99582a;
 }
 
 h1, h2, h3 {
-    font-family: 'Montserrat', sans-serif; /* Nomaini uz savu virsrakstu fontu */
+    font-family: 'Merriweather', sans-serif; /* Nomaini uz savu virsrakstu fontu */
     font-weight: bold;
+}
+
+.merriweather-<uniquifier> {
+  font-family: "Merriweather", serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
 }

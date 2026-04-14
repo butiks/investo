@@ -9,10 +9,12 @@
 	<link href = "https://fonts.google.com/specimen/Merriweather?authuser=1&preview.script=Latn">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 	
-	
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
 
 </head>
-<body>
+<body class = "bg-light">
 	<div class="container">
 		<h1>Investo</h1>
 		<nav>
@@ -36,6 +38,8 @@
 
 		<!-- te sākas citas, iekļautas lapas saturs -->
 		{% block content %}
+
+		
 		{% endblock %}
 
 
@@ -44,13 +48,16 @@
 
 
 
-        <footer>
-			Problēmu gadījumā rakstiet uz klientu apkalpošanas centru<br>
-			infoinvesto@gmail.com
-		</footer>
+       <br>
+       <br>
 
 
 	</div>
+	<hr>
+	    <footer>
+			Problēmu gadījumā rakstiet uz klientu apkalpošanas centru<br>
+			infoinvesto@gmail.com
+	    </footer>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>
