@@ -1,0 +1,41 @@
+:root {
+    --primary-custom: #99582a;    /* Nomaini uz savu Primary HEX kodu */
+    --accent-custom: #780000;     /* Nomaini uz savu Secondary HEX kodu */
+    --bg-light: #F8F9FA;          /* Gaišais fons */
+}
+
+/* Galvenās pogas krāsa */
+.btn-primary {
+    background-color: var(--primary-custom) !important;
+    border-color: var(--primary-custom) !important;
+}
+
+/* Navigācijas joslas fons (ja HTML izmanto class="navbar bg-primary") */
+.navbar.bg-primary {
+    background-color: var(--primary-custom) !important;
+}
+
+/* Akcenta krāsa saitēm vai mazām detaļām */
+a {
+    color: var(--accent-custom) !important;
+}
+
+/* Ja vēlies pielāgot kartīšu (Cards) izskatu */
+.card {
+    border-color: var(--primary-custom) !important;
+}
+
+/* Ja vēlies pielāgot veiksmes paziņojumus (Alerts) */
+.alert-success {
+    background-color: var(--primary-custom) !important;
+    color: var(--primary-custom) !important;
+    border-left: 5px solid var(--accent-custom) !important;
+}
+body {
+    font-family: 'Lato', sans-serif; /* Nomaini uz savu pamatteksta fontu */
+}
+
+h1, h2, h3 {
+    font-family: 'Montserrat', sans-serif; /* Nomaini uz savu virsrakstu fontu */
+    font-weight: bold;
+}
