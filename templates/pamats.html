@@ -36,6 +36,32 @@
 		</nav>
 		<hr>
 
+
+<h2>Visi instrumenti</h2>
+
+<div class="row">
+    {% for item in dati %}
+        <div class="col-md-3 mb-3">
+            <div class="card p-2 shadow-sm text-center">
+                <strong>{{ item.symbol }}</strong>
+                <div>{{ item.cena }}</div>
+
+                {% if item.izmaina >= 0 %}
+                    <div style="color:green">
+                        +{{ item.izmaina }} ({{ item.proc }}%)
+                    </div>
+                {% else %}
+                    <div style="color:red">
+                        {{ item.izmaina }} ({{ item.proc }}%)
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+
 		<!-- te sākas citas, iekļautas lapas saturs -->
 		{% block content %}
 
