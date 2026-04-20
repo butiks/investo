@@ -123,7 +123,16 @@ def login():
 
     return render_template("login.html")
 
-	
+@app.route("/zinas")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
+def zinas():
+    return render_template("zinas.html")
+
+
+@app.route("/atslegties")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
+def atslegties():
+    session.clear()
+    return redirect("/")
+
 
 if __name__ == "__main__":
 	app.run(debug = True)

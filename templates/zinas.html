@@ -1,0 +1,32 @@
+{% extends "pamats.html" %}
+
+{% block content %}
+<h1> Lasiet par jaunāko ekonomikā </h1>
+<p> Globālajā finanšu vidē informācijas kvalitāte ir izšķiroša. Investori, uzņēmēji un politikas veidotāji balstās datos, analīzē un uzticamos avotos. Tieši tāpēc trīs mediji — Bloomberg, Financial Times un The Wall Street Journal — tiek uzskatīti par zelta standartu finanšu žurnālistikā. Katrs no tiem piedāvā unikālu skatījumu uz tirgiem, ekonomiku un biznesu, un kopā tie veido visaptverošu informācijas ekosistēmu. </p>
+
+
+<div style="display: flex; height: 100vh;">
+  <div style="flex: 1;">
+   <img src="{{ url_for('static', filename='img/wst.png')}}" width="300">
+   <div class = "text-center">
+       <a class="btn btn-primary w-50"   href="https://www.wsj.com/" role="button">Lasi!</a>
+   </div>
+
+</div>
+  <div style="flex: 1;">
+  	<img src="{{ url_for('static', filename='img/bloomberg.png')}}" height = "250" width="350">
+  	<div class = "text-center">
+  	    <a class="btn btn-primary w-50" href="https://www.bloomberg.com/europe" role="button">Lasi!</a>
+  	</div>
+  </div>
+  <div style="flex: 1;">
+  	<img src="{{ url_for('static', filename='img/ft.png')}}"  height = "250"width="350">
+  	<div class = "text-center">
+  	    <a class="btn btn-primary w-50" href="https://www.ft.com/" role="button">Lasi!</a>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

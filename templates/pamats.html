@@ -23,7 +23,8 @@
 			<a href="/apskatit">Apskati portfeli</a> |
 			<a href="/izveidot">Izveido portfeli</a> |
 			<a href="/pievienot">Pievieno portfelim</a> |
-			<a href="/pievienot">Jaunākais ekonomikā </a> |
+			<a href="/meklet">Meklēt</a> |
+			<a href="/zinas">Jaunākais ekonomikā </a> |
 			<a href="/atslegties">Iziet</a> |
 			{% else %}
 			<a href="/pieteikties">Pieteikties</a> |
@@ -37,28 +38,6 @@
 		<hr>
 
 
-<h2>Visi instrumenti</h2>
-
-<div class="row">
-    {% for item in dati %}
-        <div class="col-md-3 mb-3">
-            <div class="card p-2 shadow-sm text-center">
-                <strong>{{ item.symbol }}</strong>
-                <div>{{ item.cena }}</div>
-
-                {% if item.izmaina >= 0 %}
-                    <div style="color:green">
-                        +{{ item.izmaina }} ({{ item.proc }}%)
-                    </div>
-                {% else %}
-                    <div style="color:red">
-                        {{ item.izmaina }} ({{ item.proc }}%)
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
-</div>
 
 
 
