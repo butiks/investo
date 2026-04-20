@@ -1,5 +1,5 @@
 :root {
-    --primary-custom: #dbb483;    /* Nomaini uz savu Primary HEX kodu */  99582a
+    --primary-custom: #f3e0c7;    /* Nomaini uz savu Primary HEX kodu  99582a */ 
     --accent-custom: #780000;     /* Nomaini uz savu Secondary HEX kodu */
     --bg-light: #99582a;          /* Gaišais fons */
 }
@@ -22,7 +22,8 @@ a {
 
 /* Ja vēlies pielāgot kartīšu (Cards) izskatu */
 .card {
-    border-color: var(--primary-custom) !important;
+    border: 1px solid var(--primary-custom) !important;
+    background-color: #f3e0c7 !important; /
 }
 
 /* Ja vēlies pielāgot veiksmes paziņojumus (Alerts) */
@@ -33,7 +34,7 @@ a {
 }
 body {
     font-family: 'Lato', sans-serif; /* Nomaini uz savu pamatteksta fontu */
-    background-color : #99582a;
+    background-color : var(--primary-custom) !important;
 }
 
 h1, h2, h3 {
