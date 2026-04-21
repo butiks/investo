@@ -28,6 +28,29 @@ def sakums():
     ]
 
     data = yf.download(instrumenti, period="1d", group_by="ticker", threads=True)
+    """
+    <div class="row">
+    {% for item in dati %}
+        <div class="col-md-3 mb-3">
+            <div class="card p-2 shadow-sm text-center">
+                <strong>{{ item.symbol }}</strong>
+                <div>{{ item.cena }}</div>
+
+                {% if item.izmaina >= 0 %}
+                    <div style="color:green">
+                        +{{ item.izmaina }} ({{ item.proc }}%)
+                    </div>
+                {% else %}
+                    <div style="color:red">
+                        {{ item.izmaina }} ({{ item.proc }}%)
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+"""
+
 
     dati = []
 
@@ -132,6 +155,10 @@ def zinas():
 def atslegties():
     session.clear()
     return redirect("/")
+
+@app.route("/pievienot")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
+def pievienot():
+    return render_template("pievienot.html")
 
 
 if __name__ == "__main__":

@@ -9,6 +9,10 @@
     background-color: var(--primary-custom) !important;
     border-color: var(--primary-custom) !important;
 }
+.btn-secondary {
+    background-color: var(--bg-light) !important;
+    border-color: var(--bg-light) !important;
+}
 
 /* Navigācijas joslas fons (ja HTML izmanto class="navbar bg-primary") */
 .navbar.bg-primary {

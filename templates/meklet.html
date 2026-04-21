@@ -3,27 +3,11 @@
 {% block content %}
 <h2>Visi instrumenti</h2>
 
-<div class="row">
-    {% for item in dati %}
-        <div class="col-md-3 mb-3">
-            <div class="card p-2 shadow-sm text-center">
-                <strong>{{ item.symbol }}</strong>
-                <div>{{ item.cena }}</div>
-
-                {% if item.izmaina >= 0 %}
-                    <div style="color:green">
-                        +{{ item.izmaina }} ({{ item.proc }}%)
-                    </div>
-                {% else %}
-                    <div style="color:red">
-                        {{ item.izmaina }} ({{ item.proc }}%)
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
-</div>
-
+  <form method="GET" action="/meklet">
+        <h2>Atrodi instrumentu</h2>
+        <input type="text" name="autors" class="form-control" placeholder="Ievadi instrumenta nosaukumu"><br>
+        <button type="submit" class="btn btn-secondary mt-2">Meklēt</button>
+    </form>
 
 
 

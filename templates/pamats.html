@@ -21,7 +21,6 @@
 			<a href="/">Sākums</a> |
 			{% if session.get("id") %}
 			<a href="/apskatit">Apskati portfeli</a> |
-			<a href="/izveidot">Izveido portfeli</a> |
 			<a href="/pievienot">Pievieno portfelim</a> |
 			<a href="/meklet">Meklēt</a> |
 			<a href="/zinas">Jaunākais ekonomikā </a> |
@@ -38,7 +37,26 @@
 		<hr>
 
 
+               <div class="row">
+    {% for viens in dati %}
+        <div class="col-md-3 mb-3 ">
+            <div class="card p-2 shadow-sm text-center">
+                <strong>{{ viens.symbol }}</strong>
+                <div>{{ viens.cena }}</div>
 
+                {% if viens.izmaina >= 0 %}
+                    <div style="color:green">
+                        +{{ viens.izmaina }} ({{ viens.proc }}%)
+                    </div>
+                {% else %}
+                    <div style="color:red">
+                        {{ viens.izmaina }} ({{ viens.proc }}%)
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
 
 
 		<!-- te sākas citas, iekļautas lapas saturs -->
