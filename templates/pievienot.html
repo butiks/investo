@@ -2,6 +2,15 @@
 
 {% block content %}
 
+<form action="/pievienot" method="POST">
+    <input type="hidden" name="symbol" value="{{ viens.symbol }}">
+    
+    <label>Daudzums:</label>
+    <input type="number" name="quantity" required>
+    
+    <button type="submit">Pirkt</button>
+</form>
+
 
   <div class="row">
     {% for item in dati %}
@@ -18,13 +27,7 @@
                     <div style="color:red">
                         {{ item.izmaina }} ({{ item.proc }}%)
                     </div>
-                    <form action="/purchase" method="POST">
-                    <label for="item">Prece:</label>
-                    <input type="text" name="item" required>
-                    <label for="quantity">Daudzums:</label>
-                    <input type="number" name="quantity" required>
-                    <button type="submit">Pirkt</button>
-                    </form>
+
                 {% endif %}
                 
             </div>

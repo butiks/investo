@@ -38,25 +38,7 @@
 
 
                <div class="row">
-    {% for viens in dati %}
-        <div class="col-md-3 mb-3 ">
-            <div class="card p-2 shadow-sm text-center">
-                <strong>{{ viens.symbol }}</strong>
-                <div>{{ viens.cena }}</div>
-
-                {% if viens.izmaina >= 0 %}
-                    <div style="color:green">
-                        +{{ viens.izmaina }} ({{ viens.proc }}%)
-                    </div>
-                {% else %}
-                    <div style="color:red">
-                        {{ viens.izmaina }} ({{ viens.proc }}%)
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
-</div>
+   
 
 
 		<!-- te sākas citas, iekļautas lapas saturs -->
