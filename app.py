@@ -74,56 +74,65 @@ def sakums():
     return render_template("pamats.html", dati=dati)
 	
 
-@app.route("/pievienot", methods=["POST"])
+@app.route("/pievienot", methods=["POST", "GET"])
 
 def pievienot():
-    if "id" not in session:
-        return redirect("/pieteikties")
+    if request.method == "POST":
+        summa = 0
 
-    symbol = request.form.get("symbol")
-    quantity = request.form.get("quantity")
+        if "id" not in session:
+            return redirect("/pieteikties")
 
-    if not symbol or not quantity:
-        return "Trūkst dati"
+        symbol = request.form.get("symbol")
+        quantity = request.form.get("quantity")
 
-    quantity = float(quantity)
+        if not symbol or not quantity:
+            return "Trūkst dati"
 
-    conn = sqlite3.connect("investicijas.db")
-    conn.row_factory = sqlite3.Row
-    c = conn.cursor()
+        quantity = float(quantity)
 
-    # 1) atrodam lietotāja portfeli
-    c.execute("SELECT id FROM Portfeļi WHERE lietotaja_id = ?", (session["id"],))
-    portfelis = c.fetchone()
+        conn = sqlite3.connect("investicijas.db")
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
 
-    if not portfelis:
-        return "Šim lietotājam nav izveidots portfelis"
+        # 1) atrodam lietotāja portfeli
+        c.execute("SELECT id FROM Portfeļi WHERE lietotaja_id = ?", (session["id"],))
+        portfelis = c.fetchone()
 
-    portfela_id = portfelis["id"]
+        if not portfelis:
+            return "Šim lietotājam nav izveidots portfelis"
 
-    # 2) atrodam aktīvu pēc simbola
-    c.execute("SELECT id FROM aktivi WHERE simbols = ?", (symbol,))
-    aktivs = c.fetchone()
+        portfela_id = portfelis["id"]
 
-    if not aktivs:
-        return f"Aktīvs ar simbolu {symbol} nav atrasts datubāzē"
+        # 2) atrodam aktīvu pēc simbola
+        c.execute("SELECT id FROM aktivi WHERE simbols = ?", (symbol,))
+        aktivs = c.fetchone()
 
-    aktiva_id = aktivs["id"]
+        if not aktivs:
+            return f"Aktīvs ar simbolu {symbol} nav atrasts datubāzē"
 
-    # 3) dabūjam šodienas cenu no yfinance
-    data = yf.download(symbol, period="1d")
-    cena = float(data["Close"].iloc[-1])
+        aktiva_id = aktivs["id"]
 
-    # 4) saglabājam pirkumu
-    c.execute("""
-        INSERT INTO Portfeļa_aktīvi (portfeļa_id, aktīva_id, daudzums, iegades_cena, iegades_datums)
-        VALUES (?, ?, ?, ?, date('now'))
-    """, (portfela_id, aktiva_id, quantity, cena))
+        # 3) dabūjam šodienas cenu no yfinance
+        data = yf.download(symbol, period="1d")
+        cena = float(data["Close"].iloc[-1])
 
-    conn.commit()
-    conn.close()
+        # 4) saglabājam pirkumu
+        c.execute("""
+            INSERT INTO Portfeļa_aktīvi (portfeļa_id, aktīva_id, daudzums, iegades_cena, iegades_datums)
+            VALUES (?, ?, ?, ?, date('now'))
+        """, (portfela_id, aktiva_id, quantity, cena))
+        summa += cena
+        c.execute("""
+            INSERT INTO Portfeļi (summa)
+            VALUES (?)
+            summa
 
-    return render_template("pievienot.html")
+            """)
+        conn.commit()
+        conn.close()
+
+        return render_template("pievienot.html")
 @app.route("/meklet")  # Lapa finanšu instrumentu meklēšanai
 def meklet():
     instrumenti = {
@@ -199,6 +208,10 @@ def login():
 @app.route("/zinas")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
 def zinas():
     return render_template("zinas.html")
+@app.route("/apskatit")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
+def apskatit():
+    return render_template("apkopojums.html")
+
 
 
 @app.route("/atslegties")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā

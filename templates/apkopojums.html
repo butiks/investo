@@ -2,7 +2,30 @@
 
 {% block content %}
 
+<table border="1">
+  <h1> Portfeļa kopsavilkums <img src="{{ url_for('static', filename='img/portfelis.svg')}}" height = "50" width="50"></h1>
+  <thead>
+    <tr>
+      <th>Lietotājvārds</th>
+      <th>Pieaugums(€) </th>
+      <th>Summa (€)</th>
+    </tr>
+  </thead>
 
+  <tbody>
+    <tr>
+      <td>{{session.lietotajvards}}</td>
+      <td>Iknedēļas pirkumi</td>
+      <td>{{session.summa}}</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <th colspan="2">KOPĀ:</th>
+      <td><strong>210.00</strong></td>
+    </tr>
+  </tfoot>
+</table>
 
 
 {% endblock %}

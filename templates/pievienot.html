@@ -3,7 +3,7 @@
 {% block content %}
 
 <form action="/pievienot" method="POST">
-    <input type="hidden" name="symbol" value="{{ viens.symbol }}">
+    <input type="hidden" name="symbol" value="{{ item.symbol }}">
     
     <label>Daudzums:</label>
     <input type="number" name="quantity" required>

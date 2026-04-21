@@ -54,3 +54,11 @@ h1, h2, h3 {
   font-variation-settings:
     "wdth" 100;
 }
+
+h4 {
+    font-family: 'Merriweather', sans-serif; 
+    font-weight: bold;
+    background-color: var(--primary-custom) !important;
+    color: var(--primary-custom) !important
+
+}
