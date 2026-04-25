@@ -1,8 +1,7 @@
 {% extends "pamats.html" %}
-
 {% block content %}
 
-<table border="1">
+<table border = "1">
   <h1> Portfeļa kopsavilkums <img src="{{ url_for('static', filename='img/portfelis.svg')}}" height = "50" width="50"></h1>
   <thead>
     <tr>
@@ -10,6 +9,7 @@
       <th>Daudzums </th>
       <th>Iegādes cena</th>
       <th>Iegādes datums</th>
+      <th>Maksa par instrumentu</th>
     </tr>
   </thead>
 
@@ -19,12 +19,17 @@
       <tr>
         <td>{{p.simbols}}</td>
         <td>{{p.daudzums}}</td>
-        <td>{{ p.iegades_cena }}</td>
+        <td>{{ p.iegades_cena }} €</td>
         <td>{{ p.iegades_datums }}</td>
+        <td>{{ p.jamaksa }} €</td>
+
       </tr>
       {% endfor %}
   </tbody>
 </table>
+<br>
+<h4 align = "left"> Kopā jāmaksā: {{kopejaa_summa}}€ </h4>
+
 
 
 {% endblock %}

@@ -1,7 +1,7 @@
 :root {
     --primary-custom: #f3e0c7;    /* Nomaini uz savu Primary HEX kodu  99582a */ 
     --accent-custom: #780000;     /* Nomaini uz savu Secondary HEX kodu */
-    --bg-light: #99582a;          /* Gaišais fons */
+    --bg-light: #c27a46;          /* Gaišais fons */
 }
 
 /* Galvenās pogas krāsa */
@@ -27,7 +27,7 @@ a {
 /* Ja vēlies pielāgot kartīšu (Cards) izskatu */
 .card {
     border: 1px solid var(--primary-custom) !important;
-    background-color: #f3e0c7 !important; /
+    background-color: #f3e0c7 !important;
 }
 
 /* Ja vēlies pielāgot veiksmes paziņojumus (Alerts) */
@@ -41,11 +41,21 @@ body {
     background-color : var(--primary-custom) !important;
 }
 
+
+
+
 h1, h2, h3 {
     font-family: 'Merriweather', sans-serif; /* Nomaini uz savu virsrakstu fontu */
     font-weight: bold;
-}
+   
 
+}
+h4 {
+    font-family: 'Merriweather', sans-serif; 
+    font-weight: bold;
+    color: var(--accent-custom) !important
+
+}
 .merriweather-<uniquifier> {
   font-family: "Merriweather", serif;
   font-optical-sizing: auto;
@@ -55,10 +65,3 @@ h1, h2, h3 {
     "wdth" 100;
 }
 
-h4 {
-    font-family: 'Merriweather', sans-serif; 
-    font-weight: bold;
-    background-color: var(--primary-custom) !important;
-    color: var(--primary-custom) !important
-
-}

@@ -26,6 +26,19 @@ def sakums():
 
 @app.route("/pievienot", methods=["POST", "GET"])
 def pievienot():
+    instrumenti = {
+        "Akcijas": [
+            "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META", "BRK-B", "V", "JNJ",
+            "WMT", "MA", "PG", "UNH", "HD", "BAC", "DIS", "ADBE", "NFLX", "PFE"
+        ],
+        "ETF Fondi": [
+            "SPY", "IVV", "VOO", "QQQ", "VTI", "VEA", "IEFA", "VUG", "VTV", "VWO",
+            "IJR", "IWF", "IJH", "IWD", "VXUS", "VIG", "SCHD", "QUAL", "VGT", "XLK"
+        ],
+        "Obligāciju ETF": [
+            "BND", "AGG", "BNDX", "TLT", "LQD", "VCIT", "BSV"
+        ]
+    }
     if request.method == "POST":
         symbol = request.form.get("symbol")
         quantity = request.form.get("quantity")
@@ -36,7 +49,7 @@ def pievienot():
         quantity = float(quantity)
 
         if quantity < 0.01:
-            return "Minimālais daudzums ir 0.01"
+            return "Minimālais daudzums ir 0.01!"
 
         conn = sqlite3.connect("investicijas.db")
         conn.row_factory = sqlite3.Row
@@ -83,9 +96,32 @@ def pievienot():
         conn.commit()
         conn.close()
 
-        return redirect("/apskatit")
+        
 
-    return render_template("pievienot.html")
+    dati = []
+
+    for kategorija, simboli in instrumenti.items():
+        for simbols in simboli:
+            data = yf.Ticker(simbols).history(period="5d")
+
+            if not data.empty and len(data) >= 2:
+                pedeja_cena = round(float(data["Close"].iloc[-1]), 2)
+                iepriekseja_cena = round(float(data["Close"].iloc[-2]), 2)
+
+                izmaina = round(pedeja_cena - iepriekseja_cena, 2)
+                proc = round((izmaina / iepriekseja_cena) * 100, 2)
+
+                dati.append({
+                    "symbol": simbols,
+                    "kategorija": kategorija,
+                    "cena": pedeja_cena,
+                    "izmaina": izmaina,
+                    "proc": proc
+                })
+
+    return render_template("pievienot.html", dati=dati)
+
+  
 
 
 @app.route("/registreties", methods=['GET', 'POST'])
@@ -163,8 +199,11 @@ def apskatit():
 
     pirkumi = c.fetchall()
     conn.close()
+    kopejaa_summa = 0
+    for p in pirkumi:
+        kopejaa_summa += p["jamaksa"]
 
-    return render_template("apkopojums.html", pirkumi=pirkumi)
+    return render_template("apkopojums.html",pirkumi=pirkumi,  kopejaa_summa=round(kopejaa_summa, 2))
 
 
 
