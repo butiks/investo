@@ -21,68 +21,12 @@ def gatekeeper():
 
 @app.route("/")
 def sakums():
-    instrumenti = [
-        "AAPL","MSFT","GOOGL","AMZN","TSLA","NVDA","META","BRK-B","V","JNJ",
-        "WMT","MA","PG","UNH","HD","BAC","DIS","ADBE","NFLX","PFE",
-        "SPY","QQQ","VTI","VOO","BND","TLT"
-    ]
-
-    data = yf.download(instrumenti, period="1d", group_by="ticker", threads=True)
-    """
-    <div class="row">
-    {% for item in dati %}
-        <div class="col-md-3 mb-3">
-            <div class="card p-2 shadow-sm text-center">
-                <strong>{{ item.symbol }}</strong>
-                <div>{{ item.cena }}</div>
-
-                {% if item.izmaina >= 0 %}
-                    <div style="color:green">
-                        +{{ item.izmaina }} ({{ item.proc }}%)
-                    </div>
-                {% else %}
-                    <div style="color:red">
-                        {{ item.izmaina }} ({{ item.proc }}%)
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
-</div>
-"""
-
-
-    dati = []
-
-    for t in instrumenti:
-        try:
-            cena = round(data[t]["Close"].iloc[-1], 2)
-            atvert = data[t]["Open"].iloc[-1]
-
-            izmaina = round(cena - atvert, 2)
-            proc = round((izmaina / atvert) * 100, 2)
-
-            dati.append({
-                "symbol": t,
-                "cena": cena,
-                "izmaina": izmaina,
-                "proc": proc
-            })
-        except:
-            continue
-
-    return render_template("pamats.html", dati=dati)
+    return render_template("pamats.html")
 	
 
 @app.route("/pievienot", methods=["POST", "GET"])
-
 def pievienot():
     if request.method == "POST":
-        summa = 0
-
-        if "id" not in session:
-            return redirect("/pieteikties")
-
         symbol = request.form.get("symbol")
         quantity = request.form.get("quantity")
 
@@ -91,71 +35,58 @@ def pievienot():
 
         quantity = float(quantity)
 
+        if quantity < 0.01:
+            return "Minimālais daudzums ir 0.01"
+
         conn = sqlite3.connect("investicijas.db")
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
-        # 1) atrodam lietotāja portfeli
-        c.execute("SELECT id FROM Portfeļi WHERE lietotaja_id = ?", (session["id"],))
+        c.execute('SELECT ID FROM "Portfeļi" WHERE lietotaja_id = ?', (session["id"],))
         portfelis = c.fetchone()
 
         if not portfelis:
-            return "Šim lietotājam nav izveidots portfelis"
+            c.execute("""
+                INSERT INTO "Portfeļi" (lietotaja_id, nosaukums, izveidots, summa)
+                VALUES (?, ?, date('now'), ?)
+            """, (session["id"], "Mans portfelis", 0))
+            portfela_id = c.lastrowid
+        else:
+            portfela_id = portfelis["ID"]
 
-        portfela_id = portfelis["id"]
-
-        # 2) atrodam aktīvu pēc simbola
-        c.execute("SELECT id FROM aktivi WHERE simbols = ?", (symbol,))
+        c.execute('SELECT ID FROM "Aktivi" WHERE simbols = ?', (symbol,))
         aktivs = c.fetchone()
 
         if not aktivs:
-            return f"Aktīvs ar simbolu {symbol} nav atrasts datubāzē"
+            c.execute("""
+                INSERT INTO "Aktivi" (simbols, nosaukums, aktiva_tips)
+                VALUES (?, ?, ?)
+            """, (symbol, symbol, "Nav norādīts"))
+            aktiva_id = c.lastrowid
+        else:
+            aktiva_id = aktivs["ID"]
 
-        aktiva_id = aktivs["id"]
+        data = yf.Ticker(symbol).history(period="5d")
 
-        # 3) dabūjam šodienas cenu no yfinance
-        data = yf.download(symbol, period="1d")
+        if data.empty:
+            conn.close()
+            return "Neizdevās iegūt cenu"
+
         cena = float(data["Close"].iloc[-1])
 
-        # 4) saglabājam pirkumu
         c.execute("""
-            INSERT INTO Portfeļa_aktīvi (portfeļa_id, aktīva_id, daudzums, iegades_cena, iegades_datums)
+            INSERT INTO "Portfeļa_aktīvi"
+            ("portfeļa_id", aktiva_id, daudzums, iegades_cena, iegades_datums)
             VALUES (?, ?, ?, ?, date('now'))
         """, (portfela_id, aktiva_id, quantity, cena))
-        summa += cena
-        c.execute("""
-            INSERT INTO Portfeļi (summa)
-            VALUES (?)
-            summa
 
-            """)
         conn.commit()
         conn.close()
 
-        return render_template("pievienot.html")
-@app.route("/meklet")  # Lapa finanšu instrumentu meklēšanai
-def meklet():
-    instrumenti = {
-        "Akcijas": [
-            "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META", "BRK-B", "V", "JNJ",
-            "WMT", "MA", "PG", "UNH", "HD", "BAC", "DIS", "ADBE", "NFLX", "PFE"
-        ],
-        "ETF Fondi": [
-            "SPY", "IVV", "VOO", "QQQ", "VTI", "VEA", "IEFA", "VUG", "VTV", "VWO",
-            "IJR", "IWF", "IJH", "IWD", "VXUS", "VIG", "SCHD", "QUAL", "VGT", "XLK"
-        ],
-        "Obligāciju ETF": [
-            "BND", "AGG", "BNDX", "TLT", "LQD", "VCIT", "BSV", "BIV", "VCSH", "TIP",
-            "IEF", "SHY", "MBB", "MUB", "HYG", "JNK", "GOVT", "VGIT", "VMBS", "EMB"
-        ]
-    }
+        return redirect("/apskatit")
 
-    return render_template("meklet.html", instrumenti=instrumenti)
+    return render_template("pievienot.html")
 
-
-
-
-   # data = yf.download(all_tickers, period="1d", group_by='ticker', threads=True)
 
 @app.route("/registreties", methods=['GET', 'POST'])
 def registreties():
@@ -208,9 +139,32 @@ def login():
 @app.route("/zinas")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
 def zinas():
     return render_template("zinas.html")
-@app.route("/apskatit")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
+@app.route("/info")  # Lapa informācijas uzziņai, par to, kas vispār ir akcijas, fondi un obligāciju fondi.
+def info():
+    return render_template("info.html")
+@app.route("/apskatit")  
 def apskatit():
-    return render_template("apkopojums.html")
+    conn = sqlite3.connect("investicijas.db")
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT 
+            Aktivi.simbols,
+            "Portfeļa_aktīvi".daudzums,
+            "Portfeļa_aktīvi".iegades_cena,
+            "Portfeļa_aktīvi".iegades_datums,
+            ROUND("Portfeļa_aktīvi".daudzums * "Portfeļa_aktīvi".iegades_cena, 2) AS jamaksa
+        FROM "Portfeļa_aktīvi"
+        JOIN Aktivi ON "Portfeļa_aktīvi".aktiva_id = Aktivi.ID
+        JOIN "Portfeļi" ON "Portfeļa_aktīvi"."portfeļa_id" = "Portfeļi".ID
+        WHERE "Portfeļi".lietotaja_id = ?
+    """, (session["id"],))
+
+    pirkumi = c.fetchall()
+    conn.close()
+
+    return render_template("apkopojums.html", pirkumi=pirkumi)
 
 
 

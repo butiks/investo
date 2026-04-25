@@ -2,14 +2,7 @@
 
 {% block content %}
 
-<form action="/pievienot" method="POST">
-    <input type="hidden" name="symbol" value="{{ item.symbol }}">
-    
-    <label>Daudzums:</label>
-    <input type="number" name="quantity" required>
-    
-    <button type="submit">Pirkt</button>
-</form>
+
 
 
   <div class="row">
@@ -17,19 +10,25 @@
         <div class="col-md-3 mb-3">
             <div class="card p-2 shadow-sm text-center">
                 <strong>{{ item.symbol }}</strong>
-                <div>{{ item.cena }}</div>
+                <div class="text-muted">
+                    {{ item.kategorija }}
+                </div>
 
                 {% if item.izmaina >= 0 %}
                     <div style="color:green">
-                        +{{ item.izmaina }} ({{ item.proc }}%)
+                        +{{ item.izmaina }} ({{ item.proc }} %) 
                     </div>
                 {% else %}
                     <div style="color:red">
-                        {{ item.izmaina }} ({{ item.proc }}%)
+                        {{ item.izmaina }} ({{ item.proc }}%) 
                     </div>
 
                 {% endif %}
-                
+                       <form action="/pievienot" method="POST" class="mt-2">
+                    <input type="hidden" name="symbol" value="{{ item.symbol }}">
+                    <input type="number" name="quantity"  min = "0.01 "step = "0.01" required>
+                    <button type="submit" class="btn btn-success mt-2">Pirkt</button>
+                </form>
             </div>
         </div>
     {% endfor %}
