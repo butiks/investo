@@ -2,7 +2,10 @@
 {% block content %}
 
 <table border = "1">
-  <h1> Portfeļa kopsavilkums <img src="{{ url_for('static', filename='img/portfelis.svg')}}" height = "50" width="50"></h1>
+   <colgroup>
+    <col span="5" style="background-color: #fdfbf9">
+  </colgroup>
+  <h1> Portfeļa kopsavilkums  💼</h1>
   <thead>
     <tr>
       <th>Simbols</th>
@@ -30,6 +33,10 @@
 <br>
 <h4 align = "left"> Kopā jāmaksā: {{kopejaa_summa}}€ </h4>
 
-
+<div align = "left">
+  <p>
+    Liels paldies, ka izvēlējies Investo 😄!
+  </p>
+</div>
 
 {% endblock %}

@@ -85,7 +85,7 @@ def pievienot():
             conn.close()
             return "Neizdevās iegūt cenu"
 
-        cena = float(data["Close"].iloc[-1])
+        cena = round(float(data["Close"].iloc[-1]),2)
 
         c.execute("""
             INSERT INTO "Portfeļa_aktīvi"

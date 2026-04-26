@@ -41,9 +41,18 @@ body {
     background-color : var(--primary-custom) !important;
 }
 
+td, th {
+  border: 1px solid #1a1616;
+  text-align: left;
+  padding: 8px;
+}
+tr:hover {background-color: #b6fcbb;}
+
+p { 
+    font-family: 'Sora', sans-serif;
 
 
-
+}
 h1, h2, h3 {
     font-family: 'Merriweather', sans-serif; /* Nomaini uz savu virsrakstu fontu */
     font-weight: bold;
@@ -53,15 +62,6 @@ h1, h2, h3 {
 h4 {
     font-family: 'Merriweather', sans-serif; 
     font-weight: bold;
-    color: var(--accent-custom) !important
-
-}
-.merriweather-<uniquifier> {
-  font-family: "Merriweather", serif;
-  font-optical-sizing: auto;
-  font-weight: <weight>;
-  font-style: normal;
-  font-variation-settings:
-    "wdth" 100;
+    color: var(--accent-custom) !important;
 }
 
