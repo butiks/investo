@@ -5,14 +5,15 @@
 
 
 
-
+  
   <div class="row">
     {% for item in dati %}
+    
         <div class="col-md-3 mb-3">
             <div class="card p-2 shadow-sm text-center">
                 <strong>{{ item.symbol }}</strong>
-                <div class="text-muted">
-                    {{ item.kategorija }}
+                <div>
+                    <p>{{ item.kategorija }}</p>
                 </div>
 
                 {% if item.izmaina >= 0 %}
@@ -25,14 +26,13 @@
                     </div>
 
                 {% endif %}
-                       <form action="/pievienot" method="POST" class="mt-2">
+                       <form action="/pievienot" method="POST" class="mt-3">
                     <input type="hidden" name="symbol" value="{{ item.symbol }}">
                     <input type="number" name="quantity"  min = "0.01 "step = "0.01" required>
-                    <button type="submit" class="btn btn-success mt-2">Iegādāties</button>
+                    <button type="submit" class="btn btn-success mt-3">Iegādāties</button>
                 </form>
             </div>
         </div>
-
     {% endfor %}
   </div>
 

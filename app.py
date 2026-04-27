@@ -63,7 +63,7 @@ def pievienot():
                 INSERT INTO "Portfeļi" (lietotaja_id, nosaukums, izveidots, summa)
                 VALUES (?, ?, date('now'), ?)
             """, (session["id"], "Mans portfelis", 0))
-            portfela_id = c.lastrowid
+            portfela_id = c.lastrowid # paņem tās rindiņas id, kura pēdējoreiz tika modificēta izmantojot INSERT vaicājumu.
         else:
             portfela_id = portfelis["ID"]
 
@@ -75,17 +75,17 @@ def pievienot():
                 INSERT INTO "Aktivi" (simbols, nosaukums, aktiva_tips)
                 VALUES (?, ?, ?)
             """, (symbol, symbol, "Nav norādīts"))
-            aktiva_id = c.lastrowid
+            aktiva_id = c.lastrowid # paņem tās rindiņas id, kura pēdējoreiz tika modificēta izmantojot INSERT vaicājumu.
         else:
             aktiva_id = aktivs["ID"]
 
-        data = yf.Ticker(symbol).history(period="5d")
+        data = yf.Ticker(symbol).history(period="3d") # Iegūst pēdējo 3 dienu instrumenta cenu  
 
         if data.empty:
             conn.close()
             return "Neizdevās iegūt cenu"
 
-        cena = round(float(data["Close"].iloc[-1]),2)
+        cena = round(float(data["Close"].iloc[0]),2) # Iegūst instrumenta cenu pirms 3 dienām
 
         c.execute("""
             INSERT INTO "Portfeļa_aktīvi"
@@ -102,14 +102,14 @@ def pievienot():
 
     for kategorija, simboli in instrumenti.items():
         for simbols in simboli:
-            data = yf.Ticker(simbols).history(period="5d")
+            data= yf.Ticker(simbols).history(period="3d")
 
             if not data.empty and len(data) >= 2:
-                pedeja_cena = round(float(data["Close"].iloc[-1]), 2)
-                iepriekseja_cena = round(float(data["Close"].iloc[-2]), 2)
+                pedeja_cena = round(float(data["Close"].iloc[-1]), 2)# Šodienas cena
+                iepriekseja_cena = round(float(data["Close"].iloc[-2]), 2) # Vakardienas cena
 
-                izmaina = round(pedeja_cena - iepriekseja_cena, 2)
-                proc = round((izmaina / iepriekseja_cena) * 100, 2)
+                izmaina = round(pedeja_cena - iepriekseja_cena, 2) # Izmaiņa €
+                proc = round((izmaina / iepriekseja_cena) * 100, 2) # Izmaiņa procentos
 
                 dati.append({
                     "symbol": simbols,
@@ -124,7 +124,7 @@ def pievienot():
   
 
 
-@app.route("/registreties", methods=['GET', 'POST'])
+@app.route("/registreties", methods=['GET', 'POST']) # Reģistrācijas lapa
 def registreties():
     if request.method == 'POST':
         lietotajs = request.form.get('lietotajs')
@@ -148,7 +148,7 @@ def registreties():
     return render_template("registreties.html")
 
 
-@app.route("/pieteikties", methods=['GET', 'POST'])# Pieteiksanaas lapa
+@app.route("/pieteikties", methods=['GET', 'POST'])# Pieteikšanās lapa
 def login():
     if request.method == 'POST':
         lietotajs = request.form.get('lietotajs')
@@ -172,13 +172,15 @@ def login():
 
     return render_template("login.html")
 
-@app.route("/zinas")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
+@app.route("/zinas")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā.
 def zinas():
     return render_template("zinas.html")
+
 @app.route("/info")  # Lapa informācijas uzziņai, par to, kas vispār ir akcijas, fondi un obligāciju fondi.
 def info():
     return render_template("info.html")
-@app.route("/apskatit")  
+
+@app.route("/apskatit")  # Lapa, kurā var apskatīt sevis iegādātos finanšu instrumentus.
 def apskatit():
     conn = sqlite3.connect("investicijas.db")
     conn.row_factory = sqlite3.Row
@@ -190,7 +192,7 @@ def apskatit():
             "Portfeļa_aktīvi".daudzums,
             "Portfeļa_aktīvi".iegades_cena,
             "Portfeļa_aktīvi".iegades_datums,
-            ROUND("Portfeļa_aktīvi".daudzums * "Portfeļa_aktīvi".iegades_cena, 2) AS jamaksa
+            ROUND("Portfeļa_aktīvi".daudzums * "Portfeļa_aktīvi".iegades_cena, 2) AS jamaksa # Aprēķina nopirktā aktīva summu
         FROM "Portfeļa_aktīvi"
         JOIN Aktivi ON "Portfeļa_aktīvi".aktiva_id = Aktivi.ID
         JOIN "Portfeļi" ON "Portfeļa_aktīvi"."portfeļa_id" = "Portfeļi".ID
