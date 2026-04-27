@@ -192,7 +192,7 @@ def apskatit():
             "Portfeļa_aktīvi".daudzums,
             "Portfeļa_aktīvi".iegades_cena,
             "Portfeļa_aktīvi".iegades_datums,
-            ROUND("Portfeļa_aktīvi".daudzums * "Portfeļa_aktīvi".iegades_cena, 2) AS jamaksa # Aprēķina nopirktā aktīva summu
+            ROUND("Portfeļa_aktīvi".daudzums * "Portfeļa_aktīvi".iegades_cena, 2) AS jamaksa 
         FROM "Portfeļa_aktīvi"
         JOIN Aktivi ON "Portfeļa_aktīvi".aktiva_id = Aktivi.ID
         JOIN "Portfeļi" ON "Portfeļa_aktīvi"."portfeļa_id" = "Portfeļi".ID
