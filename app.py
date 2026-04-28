@@ -36,8 +36,10 @@ def pievienot():
             "IJR", "IWF", "IJH", "IWD", "VXUS", "VIG", "SCHD", "QUAL", "VGT", "XLK"
         ],
         "Obligāciju ETF": [
-            "BND", "AGG", "BNDX", "TLT", "LQD", "VCIT", "BSV"
-        ]
+    "BND", "AGG", "BNDX", "TLT", "LQD", "VCIT", "BSV",
+    "IEF", "SHY", "VGIT", "VGLT", "BLV", "VCLT", "VCSH",
+    "VTIP", "TIP", "MUB", "SGOV", "VWOB", "EMB"
+]
     }
     if request.method == "POST":
         symbol = request.form.get("symbol")
