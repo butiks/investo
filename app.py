@@ -19,12 +19,12 @@ def gatekeeper():
     if 'id' not in session and request.endpoint not in publiskie_celi:
         return redirect("/pieteikties")
 
-@app.route("/")
+@app.route("/") # Sākuma lapa
 def sakums():
     return render_template("pamats.html")
 	
 
-@app.route("/pievienot", methods=["POST", "GET"])
+@app.route("/pievienot", methods=["POST", "GET"])# Lapa  instrumenta pievienošanai
 def pievienot():
     instrumenti = {
         "Akcijas": [
@@ -36,7 +36,8 @@ def pievienot():
             "IJR", "IWF", "IJH", "IWD", "VXUS", "VIG", "SCHD", "QUAL", "VGT", "XLK"
         ],
         "Obligāciju ETF": [
-            "BND", "AGG", "BNDX", "TLT", "LQD", "VCIT", "BSV"
+            "BND", "AGG", "BNDX", "TLT", "LQD", "VCIT", "BSV", "XHLF", "SPTU", "GBHI",
+            "CLIP", "BBHY", "VGUS", "IGIB", "IGLB", "USIG", "BLV"
         ]
     }
     if request.method == "POST":
@@ -189,14 +190,14 @@ def apskatit():
     c.execute("""
         SELECT 
             Aktivi.simbols,
-            "Portfeļa_aktīvi".daudzums,
-            "Portfeļa_aktīvi".iegades_cena,
-            "Portfeļa_aktīvi".iegades_datums,
-            ROUND("Portfeļa_aktīvi".daudzums * "Portfeļa_aktīvi".iegades_cena, 2) AS jamaksa 
+            Portfeļa_aktīvi.daudzums,
+            Portfeļa_aktīvi.iegades_cena,
+            Portfeļa_aktīvi.iegades_datums,
+            ROUND(Portfeļa_aktīvi.daudzums * Portfeļa_aktīvi.iegades_cena, 2) AS jamaksa 
         FROM "Portfeļa_aktīvi"
-        JOIN Aktivi ON "Portfeļa_aktīvi".aktiva_id = Aktivi.ID
-        JOIN "Portfeļi" ON "Portfeļa_aktīvi"."portfeļa_id" = "Portfeļi".ID
-        WHERE "Portfeļi".lietotaja_id = ?
+        JOIN Aktivi ON Portfeļa_aktīvi.aktiva_id = Aktivi.ID
+        JOIN Portfeļi ON Portfeļa_aktīvi.portfeļa_id = Portfeļi.ID
+        WHERE Portfeļi.lietotaja_id = ?
     """, (session["id"],))
 
     pirkumi = c.fetchall()
@@ -212,7 +213,7 @@ def apskatit():
 @app.route("/atslegties")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
 def atslegties():
     session.clear()
-    return redirect("/")
+    return redirect("/registreties")
 
 
 

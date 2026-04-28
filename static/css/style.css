@@ -51,6 +51,19 @@ tr:hover {background-color: #f3e0c7;}
 p { 
     font-family: 'Sora', sans-serif;
 
+.column {
+  float: left;
+  width: 33.33%;
+  padding: 10px;
+  
+}
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
 
 }
 h1, h2, h3 {
