@@ -37,6 +37,13 @@
 		<hr>
         
    
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          {% for message in messages %}
+              <p class="color:red;">{{ message }}</p>
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
 
         
 		<!-- te sākas citas, iekļautas lapas saturs -->

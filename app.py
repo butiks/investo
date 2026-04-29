@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for,redirect,session
+from flask import Flask, render_template, request, url_for,redirect,session, flash
 import sqlite3
 import yfinance as yf
 import pandas as pd
@@ -26,6 +26,7 @@ def sakums():
 
 @app.route("/pievienot", methods=["POST", "GET"])# Lapa  instrumenta pievienošanai
 def pievienot():
+    error = None
     instrumenti = {
         "Akcijas": [
             "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META", "BRK-B", "V", "JNJ",
@@ -45,17 +46,30 @@ def pievienot():
     
 
     }
+
     if request.method == "POST":
+       
+        
         symbol = request.form.get("symbol")
         quantity = request.form.get("quantity")
 
-        if not symbol or not quantity:
-            return "Trūkst dati"
+        data = yf.Ticker(symbol).history(period="3d") # Iegūst pēdējo 3 dienu instrumenta cenu 
+        data_heute = yf.Ticker(symbol).history(period="1d") # Iegūst šodienas cenu 
 
-        quantity = float(quantity)
+        if data.empty or data_heute.empty:
+           conn.close()
+           error = "Neizdevās iegūt cenu"
+        else :
+            flash("Šodienas cenas iegūtas!")
+            return redirect ("/pievienot")
 
-        if quantity < 0.01:
-            return "Minimālais daudzums ir 0.01!"
+        cena = round(float(data["Close"].iloc[0]),2) # Iegūst instrumenta cenu pirms 3 dienām
+
+        if float(quantity) < 0.01 :
+            flash("Daudzums par mazu!")
+        else:
+            flash('Pievienots veiksmīgi!')
+            return redirect("/pievienot") 
 
         conn = sqlite3.connect("investicijas.db")
         conn.row_factory = sqlite3.Row
@@ -85,13 +99,7 @@ def pievienot():
         else:
             aktiva_id = aktivs["ID"]
 
-        data = yf.Ticker(symbol).history(period="3d") # Iegūst pēdējo 3 dienu instrumenta cenu  
 
-        if data.empty:
-            conn.close()
-            return "Neizdevās iegūt cenu"
-
-        cena = round(float(data["Close"].iloc[0]),2) # Iegūst instrumenta cenu pirms 3 dienām
 
         c.execute("""
             INSERT INTO "Portfeļa_aktīvi"
@@ -125,7 +133,7 @@ def pievienot():
                     "proc": proc
                 })
 
-    return render_template("pievienot.html", dati=dati)
+    return render_template("pievienot.html", dati=dati, error = error)
 
   
 
