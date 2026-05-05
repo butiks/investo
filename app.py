@@ -55,6 +55,11 @@ def pievienot():
 
         data = yf.Ticker(symbol).history(period="3d") # Iegūst pēdējo 3 dienu instrumenta cenu 
         data_heute = yf.Ticker(symbol).history(period="1d") # Iegūst šodienas cenu 
+        if float(quantity) < 0.01 :
+            flash("Daudzums par 0 vai negatīvs, ievadi pozitīvu skaitli!")
+        else:
+            flash('Pievienots veiksmīgi!')
+            return redirect("/pievienot") 
 
         if data.empty or data_heute.empty:
            conn.close()
@@ -65,11 +70,7 @@ def pievienot():
 
         cena = round(float(data["Close"].iloc[0]),2) # Iegūst instrumenta cenu pirms 3 dienām
 
-        if float(quantity) < 0.01 :
-            flash("Daudzums par mazu!")
-        else:
-            flash('Pievienots veiksmīgi!')
-            return redirect("/pievienot") 
+        
 
         conn = sqlite3.connect("investicijas.db")
         conn.row_factory = sqlite3.Row
@@ -124,14 +125,19 @@ def pievienot():
 
                 izmaina = round(pedeja_cena - iepriekseja_cena, 2) # Izmaiņa €
                 proc = round((izmaina / iepriekseja_cena) * 100, 2) # Izmaiņa procentos
+                atskiriba = (pedeja_cena - cena) * quantity
 
                 dati.append({
                     "symbol": simbols,
                     "kategorija": kategorija,
                     "cena": pedeja_cena,
                     "izmaina": izmaina,
-                    "proc": proc
+                    "proc": proc,
+                    "atskiriba" : atskiriba
                 })
+    
+
+    
 
     return render_template("pievienot.html", dati=dati, error = error)
 
