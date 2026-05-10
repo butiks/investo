@@ -19,6 +19,10 @@
     background-color: var(--primary-custom) !important;
 }
 
+.alert {
+    color: black !important;
+    font-weight: bold;
+}
 /* Akcenta krāsa saitēm vai mazām detaļām */
 a {
     color: var(--accent-custom) !important;
@@ -46,7 +50,7 @@ td, th {
   text-align: left;
   padding: 8px;
 }
-tr:hover {background-color: #b6fcbb;}
+tr:hover {background-color: #f3e0c7;}
 
 p { 
     font-family: 'Sora', sans-serif;

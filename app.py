@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for,redirect,session
+from flask import Flask, render_template, request, url_for,redirect,session,get_flashed_messages, flash
 import sqlite3
 import yfinance as yf
 import pandas as pd
@@ -36,7 +36,10 @@ def pievienot():
             "IJR", "IWF", "IJH", "IWD", "VXUS", "VIG", "SCHD", "QUAL", "VGT", "XLK"
         ],
         "Obligāciju ETF": [
-            "BND", "AGG", "BNDX", "TLT", "LQD", "VCIT", "BSV"
+            "BND", "AGG", "BNDX", "TLT", "LQD",
+            "VCIT", "BSV", "IEF", "SHY", "HYG",
+            "TIP", "BIV", "BLV", "EMB", "VWOB",
+            "VGSH", "SCHO", "JNK", "USHY", "VCSH"
         ]
     }
     if request.method == "POST":
@@ -44,12 +47,27 @@ def pievienot():
         quantity = request.form.get("quantity")
 
         if not symbol or not quantity:
+            flash("Neieguvām vajadzīgos datus!", "danger")
+            return redirect("/pievienot")
+
+        try:
+            quantity = float(quantity)
+        except:
+            flash("Nepareizs daudzums!", "danger")
+            return redirect("/pievienot")
+
+        if quantity < 0.01:
+            flash("Daudzumam jābūt vismaz 0.01!", "danger")
+            return redirect("/pievienot")
+        """
+        if not symbol or not quantity:
             return "Trūkst dati"
 
         quantity = float(quantity)
 
         if quantity < 0.01:
             return "Minimālais daudzums ir 0.01!"
+        """
 
         conn = sqlite3.connect("investicijas.db")
         conn.row_factory = sqlite3.Row
@@ -79,11 +97,14 @@ def pievienot():
         else:
             aktiva_id = aktivs["ID"]
 
-        data = yf.Ticker(symbol).history(period="5d")
+        data = yf.Ticker(symbol).history(period="3d") # Iegūst pēdējo 3 dienu instrumenta cenu 
 
+                
         if data.empty:
             conn.close()
-            return "Neizdevās iegūt cenu"
+            flash("Neizdevās iegūt cenu šim simbolam!")
+            return redirect("/pievienot")
+
 
         cena = round(float(data["Close"].iloc[-1]),2)
 
@@ -96,7 +117,8 @@ def pievienot():
         conn.commit()
         conn.close()
 
-        
+        flash("Pievienots veiksmīgi!")
+        return redirect("/apskatit")
 
     dati = []
 
@@ -118,7 +140,7 @@ def pievienot():
                     "izmaina": izmaina,
                     "proc": proc
                 })
-
+    
     return render_template("pievienot.html", dati=dati)
 
   
