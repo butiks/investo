@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for,redirect,session, flash
+from flask import Flask, render_template, request, url_for,redirect,session,get_flashed_messages, flash
 import sqlite3
 import yfinance as yf
 import pandas as pd
@@ -22,11 +22,10 @@ def gatekeeper():
 @app.route("/") # Sākuma lapa
 def sakums():
     return render_template("pamats.html")
-	
+    
 
-@app.route("/pievienot", methods=["POST", "GET"])# Lapa  instrumenta pievienošanai
+@app.route("/pievienot", methods=["POST", "GET"]) # Lapa instrumentu pievienošanai
 def pievienot():
-    error = None
     instrumenti = {
         "Akcijas": [
             "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META", "BRK-B", "V", "JNJ",
@@ -37,40 +36,38 @@ def pievienot():
             "IJR", "IWF", "IJH", "IWD", "VXUS", "VIG", "SCHD", "QUAL", "VGT", "XLK"
         ],
         "Obligāciju ETF": [
-
-            "BND", "AGG", "BNDX", "TLT", "LQD", "VCIT", "BSV",
-            "IEF", "SHY", "VGIT", "VGLT", "BLV", "VCLT", "VCSH",
-            "VTIP", "TIP", "MUB", "SGOV", "VWOB", "EMB"
+            "BND", "AGG", "BNDX", "TLT", "LQD",
+            "VCIT", "BSV", "IEF", "SHY", "HYG",
+            "TIP", "BIV", "BLV", "EMB", "VWOB",
+            "VGSH", "SCHO", "JNK", "USHY", "VCSH"
         ]
-
-    
-
     }
-
     if request.method == "POST":
-       
-        
         symbol = request.form.get("symbol")
         quantity = request.form.get("quantity")
 
-        data = yf.Ticker(symbol).history(period="3d") # Iegūst pēdējo 3 dienu instrumenta cenu 
-        data_heute = yf.Ticker(symbol).history(period="1d") # Iegūst šodienas cenu 
-        if float(quantity) < 0.01 :
-            flash("Daudzums par 0 vai negatīvs, ievadi pozitīvu skaitli!")
-        else:
-            flash('Pievienots veiksmīgi!')
-            return redirect("/pievienot") 
+        if not symbol or not quantity:
+            flash("Neieguvām vajadzīgos datus!", "danger")
+            return redirect("/pievienot")
 
-        if data.empty or data_heute.empty:
-           conn.close()
-           error = "Neizdevās iegūt cenu"
-        else :
-            flash("Šodienas cenas iegūtas!")
-            return redirect ("/pievienot")
+        try:
+            quantity = float(quantity)
+        except:
+            flash("Nepareizs daudzums!", "danger")
+            return redirect("/pievienot")
 
-        cena = round(float(data["Close"].iloc[0]),2) # Iegūst instrumenta cenu pirms 3 dienām
+        if quantity < 0.01:
+            flash("Daudzumam jābūt vismaz 0.01!", "danger")
+            return redirect("/pievienot")
+        """
+        if not symbol or not quantity:
+            return "Trūkst dati"
 
-        
+        quantity = float(quantity)
+
+        if quantity < 0.01:
+            return "Minimālais daudzums ir 0.01!"
+        """
 
         conn = sqlite3.connect("investicijas.db")
         conn.row_factory = sqlite3.Row
@@ -84,7 +81,7 @@ def pievienot():
                 INSERT INTO "Portfeļi" (lietotaja_id, nosaukums, izveidots, summa)
                 VALUES (?, ?, date('now'), ?)
             """, (session["id"], "Mans portfelis", 0))
-            portfela_id = c.lastrowid # paņem tās rindiņas id, kura pēdējoreiz tika modificēta izmantojot INSERT vaicājumu.
+            portfela_id = c.lastrowid
         else:
             portfela_id = portfelis["ID"]
 
@@ -96,11 +93,20 @@ def pievienot():
                 INSERT INTO "Aktivi" (simbols, nosaukums, aktiva_tips)
                 VALUES (?, ?, ?)
             """, (symbol, symbol, "Nav norādīts"))
-            aktiva_id = c.lastrowid # paņem tās rindiņas id, kura pēdējoreiz tika modificēta izmantojot INSERT vaicājumu.
+            aktiva_id = c.lastrowid
         else:
             aktiva_id = aktivs["ID"]
 
+        data = yf.Ticker(symbol).history(period="3d") # Iegūst pēdējo 3 dienu instrumenta cenu 
 
+                
+        if data.empty:
+            conn.close()
+            flash("Neizdevās iegūt cenu šim simbolam!")
+            return redirect("/pievienot")
+
+
+        cena = round(float(data["Close"].iloc[-1]),2)
 
         c.execute("""
             INSERT INTO "Portfeļa_aktīvi"
@@ -111,35 +117,31 @@ def pievienot():
         conn.commit()
         conn.close()
 
-        
+        flash("Pievienots veiksmīgi!")
+        return redirect("/apskatit")
 
     dati = []
 
     for kategorija, simboli in instrumenti.items():
         for simbols in simboli:
-            data= yf.Ticker(simbols).history(period="3d")
+            data = yf.Ticker(simbols).history(period="5d")
 
             if not data.empty and len(data) >= 2:
-                pedeja_cena = round(float(data["Close"].iloc[-1]), 2)# Šodienas cena
-                iepriekseja_cena = round(float(data["Close"].iloc[-2]), 2) # Vakardienas cena
+                pedeja_cena = round(float(data["Close"].iloc[-1]), 2)
+                iepriekseja_cena = round(float(data["Close"].iloc[-2]), 2)
 
-                izmaina = round(pedeja_cena - iepriekseja_cena, 2) # Izmaiņa €
-                proc = round((izmaina / iepriekseja_cena) * 100, 2) # Izmaiņa procentos
-                atskiriba = (pedeja_cena - cena) * quantity
+                izmaina = round(pedeja_cena - iepriekseja_cena, 2)
+                proc = round((izmaina / iepriekseja_cena) * 100, 2)
 
                 dati.append({
                     "symbol": simbols,
                     "kategorija": kategorija,
                     "cena": pedeja_cena,
                     "izmaina": izmaina,
-                    "proc": proc,
-                    "atskiriba" : atskiriba
+                    "proc": proc
                 })
     
-
-    
-
-    return render_template("pievienot.html", dati=dati, error = error)
+    return render_template("pievienot.html", dati=dati)
 
   
 
@@ -168,7 +170,7 @@ def registreties():
     return render_template("registreties.html")
 
 
-@app.route("/pieteikties", methods=['GET', 'POST'])# Pieteikšanās lapa
+@app.route("/pieteikties", methods=['GET', 'POST'])# Pieteiksanaas lapa
 def login():
     if request.method == 'POST':
         lietotajs = request.form.get('lietotajs')
@@ -192,15 +194,13 @@ def login():
 
     return render_template("login.html")
 
-@app.route("/zinas")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā.
+@app.route("/zinas")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
 def zinas():
     return render_template("zinas.html")
-
 @app.route("/info")  # Lapa informācijas uzziņai, par to, kas vispār ir akcijas, fondi un obligāciju fondi.
 def info():
     return render_template("info.html")
-
-@app.route("/apskatit")  # Lapa, kurā var apskatīt sevis iegādātos finanšu instrumentus.
+@app.route("/apskatit")  # Lapa portfeļa instrumentu apskatīšanai
 def apskatit():
     conn = sqlite3.connect("investicijas.db")
     conn.row_factory = sqlite3.Row
@@ -209,14 +209,14 @@ def apskatit():
     c.execute("""
         SELECT 
             Aktivi.simbols,
-            Portfeļa_aktīvi.daudzums,
-            Portfeļa_aktīvi.iegades_cena,
-            Portfeļa_aktīvi.iegades_datums,
-            ROUND(Portfeļa_aktīvi.daudzums * Portfeļa_aktīvi.iegades_cena, 2) AS jamaksa 
+            "Portfeļa_aktīvi".daudzums,
+            "Portfeļa_aktīvi".iegades_cena,
+            "Portfeļa_aktīvi".iegades_datums,
+            ROUND("Portfeļa_aktīvi".daudzums * "Portfeļa_aktīvi".iegades_cena, 2) AS jamaksa
         FROM "Portfeļa_aktīvi"
-        JOIN Aktivi ON Portfeļa_aktīvi.aktiva_id = Aktivi.ID
-        JOIN Portfeļi ON Portfeļa_aktīvi.portfeļa_id = Portfeļi.ID
-        WHERE Portfeļi.lietotaja_id = ?
+        JOIN Aktivi ON "Portfeļa_aktīvi".aktiva_id = Aktivi.ID
+        JOIN "Portfeļi" ON "Portfeļa_aktīvi"."portfeļa_id" = "Portfeļi".ID
+        WHERE "Portfeļi".lietotaja_id = ?
     """, (session["id"],))
 
     pirkumi = c.fetchall()
@@ -232,9 +232,9 @@ def apskatit():
 @app.route("/atslegties")  # Lapa finanšu jaunumu lasīšanai, vietne kur uzzināt par jaunāko ekonomikā
 def atslegties():
     session.clear()
-    return redirect("/registreties")
+    return redirect("/")
 
 
 
 if __name__ == "__main__":
-	app.run(debug = True)
+    app.run(debug = True)
